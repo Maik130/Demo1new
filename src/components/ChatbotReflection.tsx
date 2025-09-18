@@ -125,11 +125,9 @@ export default function ChatbotReflection() {
       day: 'numeric'
     })
 
-    return `# 🏆 Welkom bij de Demo 1 Reflectie Tool
+    return `**Datum:** ${today}
 
-**Datum:** ${today}
-
-**Let op:** Ik behandel maar één onderwerp tegelijk, zodat je niet overweldigd raakt. Neem de tijd voor je antwoorden - goede reflectie vraagt om eerlijkheid en diepgang.`
+Dit is de ai reflectie tool, die jou gaat helpen met het reflecteren op jouw voortgang in de eerste 3 weken. Volg rustig de stappen en download aan het einde het gesprekverslag. Dit heb je nodig bij het gesprek aanstaande maandag.`
   }
 
   const handleUserInput = async (input: string) => {
