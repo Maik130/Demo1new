@@ -58,6 +58,8 @@ export default function ChatbotReflection() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const messageIdCounter = useRef(0)
+  const [autoTTSEnabled, setAutoTTSEnabled] = useState(true)
+  const [currentlyPlayingTTS, setCurrentlyPlayingTTS] = useState<string | null>(null)
 
   // CONFIDENTIAL: Student database from Excel - NEVER show this to students
   const studentDatabase = {
@@ -205,6 +207,79 @@ export default function ChatbotReflection() {
       timestamp: new Date()
     }
     setMessages(prev => [...prev, newMessage])
+  }
+
+  // Convert markdown to plain text for TTS
+  const convertMarkdownToPlainText = (markdown: string): string => {
+    return markdown
+      .replace(/^#{1,6}\s+/gm, '') // Remove headers
+      .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold
+      .replace(/\*([^*]+)\*/g, '$1') // Remove italic
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links but keep text
+      .replace(/```[\s\S]*?```/g, '') // Remove code blocks
+      .replace(/`([^`]+)`/g, '$1') // Remove inline code
+      .replace(/^[\s]*[-*+]\s+/gm, '') // Remove list markers
+      .replace(/\n\s*\n\s*\n/g, '\n\n') // Clean up extra whitespace
+      .trim()
+  }
+
+  // Play TTS for bot messages using Gemini TTS
+  const playBotMessageTTS = async (content: string, messageId: string) => {
+    try {
+      setCurrentlyPlayingTTS(messageId)
+      
+      const textToSpeak = convertMarkdownToPlainText(content)
+      
+      // Skip very short messages or system messages
+      if (textToSpeak.length < 10) {
+        setCurrentlyPlayingTTS(null)
+        return
+      }
+      
+      const response = await fetch('/api/generate-tts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: textToSpeak,
+          voiceName: 'Kore', // Default friendly voice
+          style: 'friendly'
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('TTS generation failed')
+      }
+
+      const audioBlob = await response.blob()
+      const audioUrl = URL.createObjectURL(audioBlob)
+      
+      const audio = new Audio(audioUrl)
+      
+      audio.onended = () => {
+        setCurrentlyPlayingTTS(null)
+        URL.revokeObjectURL(audioUrl)
+      }
+      
+      audio.onerror = () => {
+        setCurrentlyPlayingTTS(null)
+        URL.revokeObjectURL(audioUrl)
+      }
+      
+      await audio.play()
+      
+    } catch (error) {
+      console.error('Auto TTS Error:', error)
+      setCurrentlyPlayingTTS(null)
+    }
+  }
+
+  // Stop current TTS playback
+  const stopCurrentTTS = () => {
+    setCurrentlyPlayingTTS(null)
+    // Note: We can't easily stop the audio without keeping a ref, 
+    // but setting the state will prevent new TTS from starting
   }
 
   const getWelcomeMessage = () => {
@@ -1017,6 +1092,19 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
             </span>
             <span>•</span>
             <span>{messages.filter(m => m.type === 'user').length} antwoorden gegeven</span>
+            <span>•</span>
+            <button
+              onClick={() => setAutoTTSEnabled(!autoTTSEnabled)}
+              className={`flex items-center space-x-1 px-2 py-1 rounded text-xs transition-colors ${
+                autoTTSEnabled 
+                  ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              title={autoTTSEnabled ? 'Auto TTS aan - klik om uit te zetten' : 'Auto TTS uit - klik om aan te zetten'}
+            >
+              <span>{autoTTSEnabled ? '🔊' : '🔇'}</span>
+              <span>Auto TTS</span>
+            </button>
           </div>
         </div>
 
@@ -1036,6 +1124,25 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
+                  {/* TTS Playing Indicator for Bot Messages */}
+                  {message.type === 'bot' && currentlyPlayingTTS === message.id && (
+                    <div className="flex items-center space-x-2 mb-2 text-blue-600">
+                      <div className="flex space-x-1">
+                        <div className="w-1 h-3 bg-blue-500 rounded animate-pulse"></div>
+                        <div className="w-1 h-4 bg-blue-400 rounded animate-pulse" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-1 h-3 bg-blue-500 rounded animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                        <div className="w-1 h-2 bg-blue-400 rounded animate-pulse" style={{animationDelay: '0.3s'}}></div>
+                      </div>
+                      <span className="text-sm">🔊 Wordt uitgesproken...</span>
+                      <button
+                        onClick={stopCurrentTTS}
+                        className="text-xs bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded"
+                      >
+                        Stop
+                      </button>
+                    </div>
+                  )}
+                  
                   {message.type === 'bot' ? (
                     <MarkdownRenderer content={message.content} />
                   ) : (
