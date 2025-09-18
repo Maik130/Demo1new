@@ -1042,6 +1042,18 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
                     <p className="whitespace-pre-wrap">{message.content}</p>
                   )}
                   
+                  {/* TTS for bot messages */}
+                  {message.type === 'bot' && (
+                    <div className="mt-3">
+                      <ResponseActions 
+                        content={message.content}
+                        isMarkdown={true}
+                        isStreaming={false}
+                        className="justify-start"
+                      />
+                    </div>
+                  )}
+                  
                   {message.type === 'bot' && currentPhase === 'completed' && message.content.includes('Reflectie Voltooid') && (
                     <div className="mt-4">
                       <ResponseActions 
