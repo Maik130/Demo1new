@@ -776,7 +776,7 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
           {/* Input Area */}
           {awaitingInput && currentPhase !== 'completed' && (
             <div className="border-t border-gray-200 p-6">
-              {currentPhase === 'file_upload' && (currentQuestion === 'beroepsproduct' || currentQuestion === 'feedback_only') && (
+              {currentPhase === 'file_upload' && (currentQuestion === 'beroepsproduct' || currentQuestion === 'feedback_only' || currentQuestion === 'presentation_only') && (
                 <div className="mb-4">
                   <input
                     ref={fileInputRef}
@@ -790,9 +790,13 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
                     onClick={handleFileUploadClick}
                     className="w-full p-4 border-2 border-dashed border-purple-300 rounded-lg text-purple-600 hover:border-purple-400 hover:bg-purple-50 transition-colors"
                   >
-                    📁 {currentQuestion === 'beroepsproduct' ? 'Klik hier om je beroepsproduct te uploaden' : 'Klik hier om je feedbackformulier te uploaden'}
+                    📁 {currentQuestion === 'beroepsproduct' ? 'Klik hier om je beroepsproduct te uploaden' : 
+                         currentQuestion === 'presentation_only' ? 'Klik hier om je beroepsproduct te uploaden' :
+                         'Klik hier om je feedbackformulier te uploaden'}
                     <div className="text-sm text-gray-500 mt-1">
-                      {currentQuestion === 'beroepsproduct' ? 'Ondersteunde formaten: PDF, PowerPoint, Word' : 'Ondersteunde formaten: PDF, Word, Audio'}
+                      {(currentQuestion === 'beroepsproduct' || currentQuestion === 'presentation_only') ? 
+                       'Ondersteunde formaten: PDF, PowerPoint, Word' : 
+                       'Ondersteunde formaten: PDF, Word, Audio'}
                     </div>
                   </button>
                 </div>
