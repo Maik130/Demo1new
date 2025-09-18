@@ -53,6 +53,7 @@ export default function ChatbotReflection() {
   const [followUpCount, setFollowUpCount] = useState(0)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const messageIdCounter = useRef(0)
 
   // CONFIDENTIAL: Student database from Excel - NEVER show this to students
   const studentDatabase = {
@@ -134,8 +135,9 @@ export default function ChatbotReflection() {
   }
 
   const addBotMessage = (content: string) => {
+    messageIdCounter.current += 1
     const newMessage: Message = {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${messageIdCounter.current}`,
       type: 'bot',
       content,
       timestamp: new Date()
@@ -144,8 +146,9 @@ export default function ChatbotReflection() {
   }
 
   const addUserMessage = (content: string) => {
+    messageIdCounter.current += 1
     const newMessage: Message = {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${messageIdCounter.current}`,
       type: 'user',
       content,
       timestamp: new Date()
