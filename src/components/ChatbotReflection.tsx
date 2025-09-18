@@ -58,6 +58,7 @@ export default function ChatbotReflection() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const messageIdCounter = useRef(0)
+  const [showDownloadButton, setShowDownloadButton] = useState(true) // Always show download button
 
   // CONFIDENTIAL: Student database from Excel - NEVER show this to students
   const studentDatabase = {
@@ -968,6 +969,57 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
 *Gegenereerd door Demo Reflectie Tool - Speco Sportmarketing*`
   }
 
+  const downloadConversationReport = async () => {
+    try {
+      // Import docx dynamically
+      const { Document, Paragraph, TextRun, Packer } = await import('docx')
+      
+      const finalDocument = await generateFinalDocument()
+      
+      // Convert to Word document
+      const doc = new Document({
+        creator: "Demo Reflectie Tool",
+        title: "Gespreksverslag Demo 1 Reflectie",
+        description: "Reflectie gesprek voor Speco Sportmarketing Demo 1",
+        sections: [{
+          properties: {},
+          children: finalDocument.split('\n').map(line => 
+            new Paragraph({
+              children: [new TextRun({ text: line })],
+              spacing: { after: 120 }
+            })
+          )
+        }]
+      })
+      
+      const blob = await Packer.toBlob(doc)
+      
+      // Create download link
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      
+      // Generate filename with student info and timestamp
+      const now = new Date()
+      const timestamp = now.toISOString().slice(0, 16).replace('T', '_').replace(/:/g, '-')
+      const studentName = studentData.voornaam || 'Student'
+      const pcnNumber = studentData.pcnNummer || 'Unknown'
+      link.download = `Demo1_Reflectie_${studentName}_${pcnNumber}_${timestamp}.docx`
+      
+      // Trigger download
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      // Cleanup
+      URL.revokeObjectURL(url)
+      
+    } catch (error) {
+      console.error('Download failed:', error)
+      alert('Er is een fout opgetreden bij het downloaden van het gespreksverslag.')
+    }
+  }
+
   const handleFileUploadClick = () => {
     fileInputRef.current?.click()
   }
@@ -1017,6 +1069,15 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
             </span>
             <span>•</span>
             <span>{messages.filter(m => m.type === 'user').length} antwoorden gegeven</span>
+            <span>•</span>
+            <button
+              onClick={downloadConversationReport}
+              className="flex items-center space-x-1 px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium"
+              title="Download het gespreksverslag als Word document"
+            >
+              <span>📄</span>
+              <span>Download Gespreksverslag</span>
+            </button>
           </div>
         </div>
 
