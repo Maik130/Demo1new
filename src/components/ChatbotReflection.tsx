@@ -127,12 +127,24 @@ export default function ChatbotReflection() {
   useEffect(() => {
     if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
       const recognition = new (window as any).webkitSpeechRecognition()
-      recognition.continuous = false
+      recognition.continuous = true
       recognition.interimResults = true
       recognition.lang = 'nl-NL'
+      recognition.maxAlternatives = 1
+      
+      // Extended timeout settings for longer recordings
+      if ('webkitSpeechRecognition' in window) {
+        // These properties might not be available in all browsers
+        try {
+          (recognition as any).serviceURI = 'wss://www.google.com/speech-api/full-duplex/v1/up'
+        } catch (e) {
+          // Ignore if not supported
+        }
+      }
       
       recognition.onstart = () => {
         setIsListening(true)
+        console.log('🎤 Voice recording started - continuous mode enabled')
       }
       
       recognition.onresult = (event: any) => {
@@ -148,21 +160,49 @@ export default function ChatbotReflection() {
           }
         }
         
-        if (finalTranscript) {
-          setVoiceInputText(finalTranscript)
+        // Update with both final and interim results for better UX
+        const combinedText = finalTranscript + interimTranscript
+        if (combinedText) {
+          setVoiceInputText(combinedText)
           if (textareaRef.current) {
-            textareaRef.current.value = finalTranscript
+            textareaRef.current.value = combinedText
           }
+        }
+        
+        // Log progress for debugging
+        if (finalTranscript) {
+          console.log('🎯 Final transcript received:', finalTranscript.length, 'characters')
         }
       }
       
       recognition.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error)
+        console.error('🚨 Speech recognition error:', event.error)
+        
+        // Handle specific errors more gracefully
+        if (event.error === 'no-speech') {
+          console.log('⏳ No speech detected - continuing to listen...')
+          // Don't stop on no-speech, just continue
+          return
+        }
+        
+        if (event.error === 'audio-capture') {
+          console.error('🎤 Microphone access issue')
+        }
+        
         setIsListening(false)
       }
       
       recognition.onend = () => {
+        console.log('🏁 Voice recording ended')
         setIsListening(false)
+      }
+      
+      recognition.onspeechstart = () => {
+        console.log('🗣️ Speech detected - recording in progress')
+      }
+      
+      recognition.onspeechend = () => {
+        console.log('🤐 Speech ended - processing...')
       }
       
       setSpeechRecognition(recognition)
@@ -171,13 +211,21 @@ export default function ChatbotReflection() {
 
   const startVoiceInput = () => {
     if (speechRecognition) {
+      console.log('🎤 Starting extended voice recording session')
       setVoiceInputText('')
+      
+      // Clear the textarea to show we're starting fresh
+      if (textareaRef.current) {
+        textareaRef.current.value = ''
+      }
+      
       speechRecognition.start()
     }
   }
 
   const stopVoiceInput = () => {
     if (speechRecognition) {
+      console.log('⏹️ Manually stopping voice recording')
       speechRecognition.stop()
     }
   }
@@ -1198,14 +1246,15 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
                 {isListening && (
                   <div className="text-sm text-blue-600 flex items-center space-x-2">
                     <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                    <span>Luistert... Spreek duidelijk in het Nederlands</span>
+                    <span>🎤 Opname actief... Spreek rustig je volledige antwoord in het Nederlands</span>
                   </div>
                 )}
               </form>
               
               <div className="mt-2 text-xs text-gray-500 space-y-1">
                 <div>💡 Tip: Geef uitgebreide antwoorden. Ik help je door te vragen als je antwoord te kort is.</div>
-                <div>🎤 Gebruik de microfoon knop om je antwoord in te spreken (Nederlands)</div>
+                <div>🎤 Spraakopname: Klik 🎤 om te starten, spreek je volledige antwoord, klik ⏹️ om te stoppen</div>
+                <div>⏱️ De opname blijft actief tot je stopt - neem de tijd voor uitgebreide antwoorden</div>
               </div>
             </div>
           )}
@@ -1220,10 +1269,13 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
                 <div className="w-2 h-4 bg-blue-400 rounded animate-pulse" style={{animationDelay: '0.1s'}}></div>
                 <div className="w-2 h-8 bg-blue-500 rounded animate-pulse" style={{animationDelay: '0.2s'}}></div>
                 <div className="w-2 h-3 bg-blue-400 rounded animate-pulse" style={{animationDelay: '0.3s'}}></div>
+                <div className="w-2 h-5 bg-blue-500 rounded animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                <div className="w-2 h-7 bg-blue-400 rounded animate-pulse" style={{animationDelay: '0.5s'}}></div>
               </div>
               <div>
-                <p className="text-blue-800 font-medium">🎤 Aan het luisteren...</p>
-                <p className="text-blue-600 text-sm">Spreek duidelijk in het Nederlands. Klik op ⏹️ om te stoppen.</p>
+                <p className="text-blue-800 font-medium">🎤 Opname actief - Neem de tijd!</p>
+                <p className="text-blue-600 text-sm">Spreek rustig je volledige antwoord. De opname blijft actief tot je op ⏹️ klikt.</p>
+                <p className="text-blue-500 text-xs mt-1">💡 Perfect voor uitgebreide reflecties - geen tijdsdruk!</p>
               </div>
             </div>
           </div>
