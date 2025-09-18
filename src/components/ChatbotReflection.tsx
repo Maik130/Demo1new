@@ -167,6 +167,20 @@ export default function ChatbotReflection() {
       setSpeechRecognition(recognition)
     }
   }, [])
+
+  const startVoiceInput = () => {
+    if (speechRecognition) {
+      setVoiceInputText('')
+      speechRecognition.start()
+    }
+  }
+
+  const stopVoiceInput = () => {
+    if (speechRecognition) {
+      speechRecognition.stop()
+    }
+  }
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -1168,48 +1182,6 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
             </div>
           </div>
         )}
-
-        {/* Progress Indicator */}
-        <div className="mt-6 bg-white rounded-lg p-4 shadow-sm">
-          <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-            <span>Voortgang reflectie</span>
-            <span>{getPhaseNumber(currentPhase)}/8</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-purple-600 h-2 rounded-full transition-all duration-500"
-              style={{ width: `${(getPhaseNumber(currentPhase) / 8) * 100}%` }}
-            ></div>
-          </div>
-          <div className="mt-2 text-xs text-gray-500">
-            {getPhaseDescription(currentPhase)}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-                <textarea
-                  name="message"
-                  placeholder="Typ je antwoord hier... (neem de tijd voor een uitgebreid antwoord)"
-                  className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                  rows={3}
-                  required
-                />
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  Verstuur
-                </button>
-              </form>
-              
-              <div className="mt-2 text-xs text-gray-500">
-                💡 Tip: Geef uitgebreide antwoorden. Ik help je door te vragen als je antwoord te kort is.
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* Progress Indicator */}
         <div className="mt-6 bg-white rounded-lg p-4 shadow-sm">
