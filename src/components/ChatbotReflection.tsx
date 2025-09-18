@@ -359,14 +359,13 @@ Geef niet alleen de feedback weer, maar vertel ook wat je ervan vindt en waarom 
   }
 
   const handleFeedbackAnalysis = async (input: string) => {
-    if (input.trim().length < 20) {
+    // Inhoudelijke validatie per onderdeel
+    const validationResult = validateFeedbackContent(input, currentQuestion)
+    
+    if (!validationResult.isComplete) {
       setFollowUpCount(prev => prev + 1)
-      if (followUpCount < 2) {
-        addBotMessage(`Dat is nog vrij kort. Kun je wat meer vertellen? Bijvoorbeeld:
-- Wat was de exacte feedback?
-- Hoe kijk je daar zelf tegenaan?
-- Waarom denk je dat je deze feedback kreeg?
-- Wat had je anders kunnen doen?`)
+      if (followUpCount < 3) {
+        addBotMessage(validationResult.followUpMessage)
         setAwaitingInput(true)
         return
       }
@@ -431,15 +430,13 @@ Maak het concreet - niet "beter presenteren" maar bijvoorbeeld "meer oogcontact 
   }
 
   const handleActionPlanning = async (input: string) => {
-    if (input.trim().length < 50) {
+    // Valideer actiepunten op SMART criteria
+    const actionValidation = validateActionPoints(input)
+    
+    if (!actionValidation.isComplete) {
       setFollowUpCount(prev => prev + 1)
-      if (followUpCount < 2) {
-        addBotMessage(`Je actiepunten kunnen nog concreter. Probeer voor elk punt te beschrijven:
-- WAT ga je precies doen?
-- HOE ga je het aanpakken?
-- WANNEER ga je het doen?
-
-Bijvoorbeeld: "Ik ga mijn bronnenlijst verbeteren door minimaal 5 recente (2023-2024) vakartikelen te zoeken via de NHL database, en deze volgens APA-stijl verwerken voor 15 maart."`)
+      if (followUpCount < 3) {
+        addBotMessage(actionValidation.followUpMessage)
         setAwaitingInput(true)
         return
       }
@@ -515,10 +512,15 @@ Geef alleen de actiepunten terug, elk op een nieuwe regel, zonder nummering.`,
 
   const handleCheckpointReview = async (input: string) => {
     if (currentQuestion === 'checkpoint3_analysis') {
-      if (input.trim().length < 30) {
-        addBotMessage("Kun je wat dieper ingaan op je resultaat? Wat was je studieaanpak? Welke onderdelen vond je moeilijk?")
-        setAwaitingInput(true)
-        return
+      const checkpointValidation = validateCheckpointAnalysis(input, 'checkpoint3')
+      
+      if (!checkpointValidation.isComplete) {
+        setFollowUpCount(prev => prev + 1)
+        if (followUpCount < 3) {
+          addBotMessage(checkpointValidation.followUpMessage)
+          setAwaitingInput(true)
+          return
+        }
       }
 
       addBotMessage(`**Checkpoint 6 (${studentData.checkpoint6Resultaat}):**
@@ -531,10 +533,15 @@ Kun je aan de hand van de testvision vertellen welke onderdelen je goed of slech
       setAwaitingInput(true)
       
     } else if (currentQuestion === 'checkpoint6_analysis') {
-      if (input.trim().length < 30) {
-        addBotMessage("Probeer specifieker te zijn over welke leerdoelen je wel/niet beheerste en waarom.")
-        setAwaitingInput(true)
-        return
+      const checkpointValidation = validateCheckpointAnalysis(input, 'checkpoint6')
+      
+      if (!checkpointValidation.isComplete) {
+        setFollowUpCount(prev => prev + 1)
+        if (followUpCount < 3) {
+          addBotMessage(checkpointValidation.followUpMessage)
+          setAwaitingInput(true)
+          return
+        }
       }
 
       // Ga naar aanwezigheid
@@ -566,10 +573,15 @@ Zijn er nog lessen geweest die je hebt gemist? En zo ja, hoe heb je die gemiste 
   }
 
   const handleAttendanceReview = async (input: string) => {
-    if (input.trim().length < 20) {
-      addBotMessage("Kun je wat uitgebreider antwoorden? Dit is belangrijk voor je studiesucces.")
-      setAwaitingInput(true)
-      return
+    const attendanceValidation = validateAttendanceResponse(input, studentData.aanwezigheidsPercentage || 0)
+    
+    if (!attendanceValidation.isComplete) {
+      setFollowUpCount(prev => prev + 1)
+      if (followUpCount < 3) {
+        addBotMessage(attendanceValidation.followUpMessage)
+        setAwaitingInput(true)
+        return
+      }
     }
 
     // Ga naar persoonlijke bijdrage
@@ -593,14 +605,12 @@ Denk aan:
   }
 
   const handlePersonalContribution = async (input: string) => {
-    if (input.trim().length < 40) {
+    const teamValidation = validateTeamContribution(input)
+    
+    if (!teamValidation.isComplete) {
       setFollowUpCount(prev => prev + 1)
-      if (followUpCount < 2) {
-        addBotMessage(`Probeer concreter te zijn:
-- Welke specifieke taken deed jij?
-- Hoe reageerden je teamgenoten op jouw inbreng?
-- Kun je een voorbeeld geven van hoe je het team hebt geholpen?
-- Wat zou je volgende keer anders doen?`)
+      if (followUpCount < 3) {
+        addBotMessage(teamValidation.followUpMessage)
         setAwaitingInput(true)
         return
       }
