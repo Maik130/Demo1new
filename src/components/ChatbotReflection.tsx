@@ -60,6 +60,7 @@ export default function ChatbotReflection() {
   const messageIdCounter = useRef(0)
   const [autoTTSEnabled, setAutoTTSEnabled] = useState(true)
   const [currentlyPlayingTTS, setCurrentlyPlayingTTS] = useState<string | null>(null)
+  const [speechError, setSpeechError] = useState<string>('')
 
   // CONFIDENTIAL: Student database from Excel - NEVER show this to students
   const studentDatabase = {
@@ -1282,6 +1283,25 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
               <div>
                 <p className="text-blue-800 font-medium">🎤 Aan het luisteren...</p>
                 <p className="text-blue-600 text-sm">Spreek duidelijk in het Nederlands. Klik op ⏹️ om te stoppen.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Speech Recognition Error */}
+        {speechError && (
+          <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <span className="text-red-600">❌</span>
+              <div>
+                <p className="text-red-800 font-medium">Spraakherkenning probleem</p>
+                <p className="text-red-700 text-sm">{speechError}</p>
+                <button
+                  onClick={() => setSpeechError('')}
+                  className="mt-2 text-xs bg-red-100 hover:bg-red-200 px-2 py-1 rounded"
+                >
+                  Sluiten
+                </button>
               </div>
             </div>
           </div>
