@@ -52,7 +52,7 @@ export default function ChatbotReflection() {
   const [currentQuestion, setCurrentQuestion] = useState('')
   const [followUpCount, setFollowUpCount] = useState(0)
   const [isListening, setIsListening] = useState(false)
-  const [speechRecognition, setSpeechRecognition] = useState<SpeechRecognition | null>(null)
+  const [speechRecognition, setSpeechRecognition] = useState<any | null>(null)
   const [voiceInputText, setVoiceInputText] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
