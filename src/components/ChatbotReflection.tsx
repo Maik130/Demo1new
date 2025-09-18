@@ -264,48 +264,50 @@ Perfect! Nu kunnen we verder met je reflectie.`)
       // Ga naar volgende fase
       setTimeout(() => {
         setCurrentPhase('file_upload')
-        addBotMessage(`## 📁 Bestanden Uploaden
+        addBotMessage(`## 📁 **Stap 1: Beroepsproduct Uploaden**
 
-Nu heb ik je **presentatie** nodig die je hebt gebruikt bij de demo, en het **document of audio-opname** met de feedback die je hebt ontvangen.
+Nu heb ik je **beroepsproduct/presentatie** nodig die je hebt gebruikt bij de demo.
 
-Kun je deze bestanden uploaden? Je kunt ze hier slepen of op de upload knop klikken.`)
+Dit kan zijn:
+- PowerPoint presentatie (.ppt, .pptx)
+- PDF document
+- Word document
+- Ander presentatieformaat
+
+Kun je je beroepsproduct uploaden? Je kunt het hier slepen of op de upload knop klikken.`)
         setAwaitingInput(true)
-        setCurrentQuestion('files')
+        setCurrentQuestion('beroepsproduct')
       }, 2000)
     }
   }
 
   const handleFileUpload = async (input: string) => {
-    if (currentQuestion === 'beroepsproduct') {
-      // Eerste bestand ontvangen (beroepsproduct/presentatie)
-      addBotMessage("✅ **Beroepsproduct ontvangen!**")
-      addBotMessage("Ik heb je beroepsproduct/presentatie succesvol ontvangen en ga deze analyseren.")
+    if (currentQuestion === 'presentation_only') {
+      // Eerste bestand ontvangen (presentatie)
+      addBotMessage("Perfect! Ik heb je presentatie ontvangen.")
       
       setTimeout(() => {
-        addBotMessage(`## 📋 **Stap 2: Feedbackformulier**
+        addBotMessage(`**Stap 2: Upload je feedbackformulier**
 
 Nu heb ik het **feedbackformulier** of **document met feedback** nodig dat je hebt ontvangen na je demo.
 
-**Heb je geen schriftelijke feedback ontvangen?**  
-Typ dan **"geen feedback"** en we gaan samen inhoudelijk je presentatie doorlopen.`)
-        setCurrentQuestion('feedback_document')
+Heb je geen schriftelijke feedback ontvangen? Typ dan **"geen feedback"** en we gaan samen inhoudelijk je presentatie doorlopen.`)
+        setCurrentQuestion('feedback_only')
         setAwaitingInput(true)
-      }, 2000)
+      }, 1500)
       
-    } else if (currentQuestion === 'feedback_document') {
+    } else if (currentQuestion === 'feedback_only') {
       // Check of student geen feedback heeft
       if (input.toLowerCase().includes('geen feedback')) {
-        addBotMessage(`✅ **Geen probleem!**
-
-Dan gaan we samen inhoudelijk je beroepsproduct/presentatie doorlopen.
+        addBotMessage(`Geen probleem! Dan gaan we samen inhoudelijk je presentatie doorlopen.
 
 Ik ga je helpen reflecteren op basis van wat je zelf hebt gepresenteerd.`)
         
         setTimeout(() => {
           setCurrentPhase('feedback_analysis')
-          addBotMessage(`## 📝 **Inhoudelijke Beroepsproduct Review**
+          addBotMessage(`## 📝 Inhoudelijke Presentatie Review
 
-Laten we je beroepsproduct samen doorlopen per onderdeel.
+Laten we je presentatie samen doorlopen per onderdeel.
 
 **Eerst de Macro Analyse:** Welke trends, ontwikkelingen en factoren uit de grote marktomgeving heb je behandeld in je presentatie?
 
@@ -319,9 +321,8 @@ Vertel niet alleen wat je hebt gepresenteerd, maar ook:
         }, 2000)
         
       } else {
-        // Tweede bestand ontvangen (feedbackformulier)
-        addBotMessage("✅ **Feedbackformulier ontvangen!**")
-        addBotMessage("Uitstekend! Ik heb nu beide bestanden: je beroepsproduct én je feedbackformulier.")
+        // Tweede bestand ontvangen (feedback)
+        addBotMessage("Uitstekend! Ik heb nu beide bestanden: je presentatie én je feedback.")
         
         setTimeout(() => {
           setCurrentPhase('feedback_analysis')
@@ -337,6 +338,23 @@ Geef niet alleen de feedback weer, maar vertel ook wat je ervan vindt en waarom 
           setFollowUpCount(0)
         }, 2000)
       }
+    } else {
+      // Eerste keer files uploaden
+      addBotMessage("Dank je! Ik heb je bestanden ontvangen.")
+      
+      setTimeout(() => {
+        setCurrentPhase('feedback_analysis')
+        addBotMessage(`## 📝 Feedback Analyse
+
+Ik heb je feedback doorgenomen. Laten we dit per onderdeel bespreken.
+
+**Eerst de Macro Analyse:** Wat was de specifieke feedback die je kreeg op je macro analyse (de grote marktomgeving, trends, ontwikkelingen)?
+
+Geef niet alleen de feedback weer, maar vertel ook wat je ervan vindt en waarom je denkt dat je deze feedback kreeg.`)
+        setCurrentQuestion('macro_feedback')
+        setAwaitingInput(true)
+        setFollowUpCount(0)
+      }, 1500)
     }
   }
 
