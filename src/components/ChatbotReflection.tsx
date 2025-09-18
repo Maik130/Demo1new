@@ -219,14 +219,14 @@ Dit is de ai reflectie tool, die jou gaat helpen met het reflecteren op jouw voo
       }
       
       setStudentData(prev => ({ ...prev, voornaam: input.trim() }))
-      addBotMessage(`Hoi ${input.trim()}! Nu heb ik je **PCN-nummer** nodig. Dit is het 7-cijferige nummer uit je studentenemailadres (bijvoorbeeld: 1234567@student.nhlstenden.com).`)
+      addBotMessage(`Hoi ${input.trim()}! Nu heb ik je **PCN-nummer** nodig. Dit is het 6-cijferige nummer uit je studentenemailadres (bijvoorbeeld: 123456@student.fontys.nl).`)
       setCurrentQuestion('pcn_nummer')
       setAwaitingInput(true)
       
     } else if (currentQuestion === 'pcn_nummer') {
-      const pcnPattern = /^\d{7}$/
+      const pcnPattern = /^\d{6}$/
       if (!pcnPattern.test(input.trim())) {
-        addBotMessage("Een PCN-nummer bestaat uit precies 7 cijfers. Kun je het nogmaals invoeren? (bijvoorbeeld: 1234567)")
+        addBotMessage("Een PCN-nummer bestaat uit precies 6 cijfers. Kun je het nogmaals invoeren? (bijvoorbeeld: 123456)")
         setAwaitingInput(true)
         return
       }
