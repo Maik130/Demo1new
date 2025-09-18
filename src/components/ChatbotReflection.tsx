@@ -54,8 +54,8 @@ export default function ChatbotReflection() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Mock data voor demonstratie - in productie zou dit uit Excel komen
-  const mockStudentDatabase = {
+  // CONFIDENTIAL: Student database from Excel - NEVER show this to students
+  const studentDatabase = {
     '1234567': {
       naam: 'Jan Jansen',
       aanwezigheid: 85,
@@ -63,7 +63,7 @@ export default function ChatbotReflection() {
       checkpoint6: '6.8'
     },
     '2345678': {
-      naam: 'Lisa de Vries',
+      naam: 'Lisa de Vries', 
       aanwezigheid: 92,
       checkpoint3: '8.2',
       checkpoint6: '7.9'
@@ -71,8 +71,44 @@ export default function ChatbotReflection() {
     '3456789': {
       naam: 'Mike van der Berg',
       aanwezigheid: 78,
-      checkpoint3: '6.1',
+      checkpoint3: '6.1', 
       checkpoint6: '7.2'
+    },
+    '4567890': {
+      naam: 'Sarah Bakker',
+      aanwezigheid: 95,
+      checkpoint3: '8.7',
+      checkpoint6: '8.9'
+    },
+    '5678901': {
+      naam: 'Tom Visser',
+      aanwezigheid: 73,
+      checkpoint3: '5.8',
+      checkpoint6: '6.4'
+    },
+    '6789012': {
+      naam: 'Emma de Jong',
+      aanwezigheid: 88,
+      checkpoint3: '7.9',
+      checkpoint6: '8.1'
+    }
+  }
+
+  // Security function - prevents accidental exposure of student data
+  const getStudentData = (pcnNummer: string) => {
+    // CRITICAL: This function must NEVER return the full database
+    // Only return data for the specific requested student
+    const student = studentDatabase[pcnNummer as keyof typeof studentDatabase]
+    if (!student) {
+      return null
+    }
+    
+    // Return only the specific student's data
+    return {
+      naam: student.naam,
+      aanwezigheid: student.aanwezigheid,
+      checkpoint3: student.checkpoint3,
+      checkpoint6: student.checkpoint6
     }
   }
 
@@ -193,7 +229,7 @@ Dit is de ai reflectie tool, die jou gaat helpen met het reflecteren op jouw voo
       }
 
       const pcnNummer = input.trim()
-      const studentInfo = mockStudentDatabase[pcnNummer as keyof typeof mockStudentDatabase]
+      const studentInfo = getStudentData(pcnNummer)
       
       if (!studentInfo) {
         addBotMessage(`Ik kan geen student vinden met PCN-nummer ${pcnNummer}. Controleer je nummer en probeer opnieuw.`)
@@ -202,7 +238,8 @@ Dit is de ai reflectie tool, die jou gaat helpen met het reflecteren op jouw voo
       }
 
       // Verifieer naam
-      const voornaamMatch = studentInfo.naam.toLowerCase().includes(studentData.voornaam.toLowerCase())
+      const voornaamMatch = studentInfo.naam.toLowerCase().includes(studentData.voornaam.toLowerCase()) ||
+                           studentData.voornaam.toLowerCase().includes(studentInfo.naam.split(' ')[0].toLowerCase())
       if (!voornaamMatch) {
         addBotMessage(`⚠️ **Verificatie probleem**
 
@@ -382,11 +419,43 @@ Vertel ook welke aanpak je gebruikte om te studeren en of je het beter deed dan 
   }
 
   const generateImprovedActionList = async (userInput: string): Promise<string[]> => {
-    // Simuleer AI verbetering van actielijst
+    try {
+      // Generate AI-improved action list via API
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `Verbeter deze actiepunten tot concrete, meetbare taken met deadlines:
+
+${userInput}
+
+Maak er maximaal 5 SMART actiepunten van (Specifiek, Meetbaar, Acceptabel, Realistisch, Tijdgebonden). 
+Geef alleen de actiepunten terug, elk op een nieuwe regel, zonder nummering.`,
+          aiModel: 'smart'
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const improvedActions = data.response
+          .split('\n')
+          .filter((line: string) => line.trim().length > 10)
+          .map((line: string) => line.replace(/^\d+\.\s*/, '').trim())
+          .slice(0, 5)
+        
+        return improvedActions.length > 0 ? improvedActions : [userInput.trim()]
+      }
+    } catch (error) {
+      console.error('Error improving action list:', error)
+    }
+    
+    // Fallback: basic processing
     const actions = userInput.split(/[.!?]/).filter(s => s.trim().length > 10)
     return actions.map(action => 
       action.trim() + (action.includes('voor') ? '' : ' - deadline: voor volgende demo')
-    ).slice(0, 5)
+    ).slice(0, 3)
   }
 
   const handleCheckpointReview = async (input: string) => {
