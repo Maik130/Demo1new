@@ -734,7 +734,7 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
           {/* Input Area */}
           {awaitingInput && currentPhase !== 'completed' && (
             <div className="border-t border-gray-200 p-6">
-              {currentPhase === 'file_upload' && currentQuestion === 'files' && (
+              {currentPhase === 'file_upload' && (currentQuestion === 'presentation_only' || currentQuestion === 'feedback_only') && (
                 <div className="mb-4">
                   <input
                     ref={fileInputRef}
@@ -748,9 +748,9 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
                     onClick={handleFileUploadClick}
                     className="w-full p-4 border-2 border-dashed border-purple-300 rounded-lg text-purple-600 hover:border-purple-400 hover:bg-purple-50 transition-colors"
                   >
-                    📁 Klik hier om bestanden te uploaden
+                    📁 {currentQuestion === 'presentation_only' ? 'Klik hier om je presentatie te uploaden' : 'Klik hier om je feedbackformulier te uploaden'}
                     <div className="text-sm text-gray-500 mt-1">
-                      Ondersteunde formaten: PDF, PowerPoint, Word, Audio
+                      {currentQuestion === 'presentation_only' ? 'Presentatie formaten: PDF, PowerPoint, Word' : 'Feedback formaten: PDF, Word, Audio, of typ "geen feedback"'}
                     </div>
                   </button>
                 </div>
