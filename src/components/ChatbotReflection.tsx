@@ -334,7 +334,7 @@ Inclusief:
 - Leesbaarheid
 - Structuur en flow
 - Je presentatievaardigheden`)
-      setCurrentQuestion('opmaak_feedback'
+      setCurrentQuestion('opmaak_feedback')
       setFollowUpCount(0)
       setAwaitingInput(true)
       
