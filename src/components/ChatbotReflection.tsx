@@ -358,6 +358,229 @@ Geef niet alleen de feedback weer, maar vertel ook wat je ervan vindt en waarom 
     }
   }
 
+  // Inhoudelijke validatie functies
+  const validateFeedbackContent = (input: string, question: string) => {
+    const text = input.toLowerCase()
+    
+    switch (question) {
+      case 'macro_feedback':
+        const hasMacroElements = [
+          text.includes('trend') || text.includes('ontwikkeling'),
+          text.includes('markt') || text.includes('omgeving'),
+          text.includes('feedback') || text.includes('opmerking'),
+          text.includes('waarom') || text.includes('omdat') || text.includes('reden')
+        ]
+        
+        if (hasMacroElements.filter(Boolean).length < 2) {
+          return {
+            isComplete: false,
+            followUpMessage: `Je antwoord over de macro analyse kan nog completer. Probeer alle aspecten te behandelen:
+
+🔍 **Wat ontbreekt nog:**
+- Welke **specifieke feedback** kreeg je op je macro analyse?
+- Welke **trends/ontwikkelingen** had je behandeld?
+- **Waarom** denk je dat je deze feedback kreeg?
+- Wat had je **anders** kunnen doen?
+- Hoe kijk je **zelf** tegen deze feedback aan?`
+          }
+        }
+        break
+        
+      case 'meso_feedback':
+        const hasMesoElements = [
+          text.includes('sport') || text.includes('branche'),
+          text.includes('concurrent') || text.includes('doelgroep'),
+          text.includes('feedback') || text.includes('opmerking'),
+          input.trim().length > 30
+        ]
+        
+        if (hasMesoElements.filter(Boolean).length < 3) {
+          return {
+            isComplete: false,
+            followUpMessage: `Je meso analyse antwoord kan nog uitgebreider. Behandel deze punten:
+
+🎯 **Meso analyse aspecten:**
+- Feedback op je **sportbranche** analyse
+- Feedback op **concurrentieanalyse**
+- Feedback op **doelgroep** onderzoek
+- Je **eigen reflectie** op deze feedback
+- Wat zou je **volgende keer** anders doen?`
+          }
+        }
+        break
+        
+      case 'bronnen_feedback':
+        const hasBronnenElements = [
+          text.includes('bron') || text.includes('referentie'),
+          text.includes('apa') || text.includes('stijl') || text.includes('vermelding'),
+          text.includes('actueel') || text.includes('recent') || text.includes('kwaliteit'),
+          input.trim().length > 25
+        ]
+        
+        if (hasBronnenElements.filter(Boolean).length < 2) {
+          return {
+            isComplete: false,
+            followUpMessage: `Je bronnenlijst feedback kan nog specifieker. Behandel deze aspecten:
+
+📚 **Bronnenlijst feedback:**
+- Feedback op **kwaliteit** van je bronnen
+- Feedback op **APA-stijl** vermelding
+- Feedback op **actualiteit** (recente bronnen?)
+- Feedback op **relevantie** voor sportmarketing
+- Wat ga je **verbeteren** aan je bronnengebruik?`
+          }
+        }
+        break
+        
+      case 'opmaak_feedback':
+        const hasOpmaakElements = [
+          text.includes('opmaak') || text.includes('layout') || text.includes('design'),
+          text.includes('presentatie') || text.includes('presenteren'),
+          text.includes('feedback') || text.includes('opmerking'),
+          input.trim().length > 25
+        ]
+        
+        if (hasOpmaakElements.filter(Boolean).length < 2) {
+          return {
+            isComplete: false,
+            followUpMessage: `Je opmaak feedback kan nog completer. Behandel deze punten:
+
+🎨 **Opmaak & Presentatie feedback:**
+- Feedback op **visuele opmaak** van je presentatie
+- Feedback op je **presentatiestijl** en vaardigheden
+- Feedback op **leesbaarheid** en structuur
+- Je **eigen ervaring** tijdens het presenteren
+- Wat ga je **verbeteren** voor volgende keer?`
+          }
+        }
+        break
+    }
+    
+    return { isComplete: true, followUpMessage: '' }
+  }
+
+  const validateActionPoints = (input: string) => {
+    const text = input.toLowerCase()
+    const hasActionElements = [
+      text.includes('ga ik') || text.includes('wil ik') || text.includes('plan ik'),
+      text.includes('voor') || text.includes('tot') || text.includes('datum') || text.includes('week'),
+      text.split(/[.!?]/).length >= 3, // Minimaal 3 zinnen/actiepunten
+      input.trim().length > 60
+    ]
+    
+    if (hasActionElements.filter(Boolean).length < 3) {
+      return {
+        isComplete: false,
+        followUpMessage: `Je actiepunten kunnen nog SMART-er. Maak ze concreter:
+
+🎯 **SMART Actiepunten (minimaal 3):**
+- **Specifiek:** WAT ga je precies doen?
+- **Meetbaar:** HOE weet je dat het gelukt is?
+- **Acceptabel:** Waarom is dit belangrijk?
+- **Realistisch:** Kun je dit echt doen?
+- **Tijdgebonden:** WANNEER ga je dit doen?
+
+**Voorbeeld:** "Ik ga voor 20 maart minimaal 5 recente (2023-2024) sportmarketing artikelen zoeken via de NHL database en deze volgens APA-stijl verwerken in mijn bronnenlijst."`
+      }
+    }
+    
+    return { isComplete: true, followUpMessage: '' }
+  }
+
+  const validateCheckpointAnalysis = (input: string, checkpoint: string) => {
+    const text = input.toLowerCase()
+    const hasAnalysisElements = [
+      text.includes('studie') || text.includes('leren') || text.includes('voorbereid'),
+      text.includes('moeilijk') || text.includes('makkelijk') || text.includes('onderdeel'),
+      text.includes('omdat') || text.includes('doordat') || text.includes('reden'),
+      input.trim().length > 40
+    ]
+    
+    if (hasAnalysisElements.filter(Boolean).length < 3) {
+      return {
+        isComplete: false,
+        followUpMessage: `Je ${checkpoint} analyse kan nog dieper. Behandel deze aspecten:
+
+📊 **${checkpoint.toUpperCase()} Analyse:**
+- **Studieaanpak:** Hoe heb je je voorbereid?
+- **Moeilijke onderdelen:** Welke leerdoelen waren lastig?
+- **Makkelijke onderdelen:** Wat ging goed?
+- **Verklaring:** WAAROM behaalde je dit resultaat?
+- **Verwachting:** Deed je het beter/slechter dan verwacht?
+- **Aanpak:** Wat zou je anders doen?`
+      }
+    }
+    
+    return { isComplete: true, followUpMessage: '' }
+  }
+
+  const validateAttendanceResponse = (input: string, attendancePercentage: number) => {
+    const text = input.toLowerCase()
+    const isLowAttendance = attendancePercentage < 80
+    
+    const hasAttendanceElements = [
+      isLowAttendance ? (text.includes('reden') || text.includes('omdat') || text.includes('door')) : true,
+      text.includes('invloed') || text.includes('gevolg') || text.includes('impact') || text.includes('effect'),
+      text.includes('verbeteren') || text.includes('anders') || text.includes('plan'),
+      input.trim().length > 30
+    ]
+    
+    if (hasAttendanceElements.filter(Boolean).length < 3) {
+      const lowAttendanceMessage = isLowAttendance ? 
+        `Je aanwezigheid (${attendancePercentage}%) is onder de 80% grens. Behandel deze punten:
+
+📅 **Aanwezigheid Analyse:**
+- **Reden:** Waarom was je vaak afwezig?
+- **Impact:** Welke invloed had dit op je resultaten?
+- **Gemiste stof:** Hoe heb je dit ingehaald?
+- **Verbeterplan:** Hoe ga je dit aanpakken?
+- **Concrete acties:** Wat doe je anders?` :
+        `Je hebt goede aanwezigheid (${attendancePercentage}%). Vertel meer:
+
+📅 **Aanwezigheid Reflectie:**
+- **Gemiste lessen:** Welke lessen heb je gemist?
+- **Inhalen:** Hoe heb je gemiste stof ingehaald?
+- **Impact:** Merkte je verschil bij gemiste lessen?
+- **Voordeel:** Hoe helpt goede aanwezigheid je?`
+      
+      return {
+        isComplete: false,
+        followUpMessage: lowAttendanceMessage
+      }
+    }
+    
+    return { isComplete: true, followUpMessage: '' }
+  }
+
+  const validateTeamContribution = (input: string) => {
+    const text = input.toLowerCase()
+    const hasTeamElements = [
+      text.includes('taak') || text.includes('deed ik') || text.includes('verantwoordelijk'),
+      text.includes('team') || text.includes('groep') || text.includes('samen'),
+      text.includes('bijdrage') || text.includes('geholpen') || text.includes('ondersteund'),
+      text.includes('volgende keer') || text.includes('anders') || text.includes('verbeteren'),
+      input.trim().length > 50
+    ]
+    
+    if (hasTeamElements.filter(Boolean).length < 4) {
+      return {
+        isComplete: false,
+        followUpMessage: `Je teambijdrage reflectie kan nog concreter. Behandel alle aspecten:
+
+👥 **Persoonlijke Teambijdrage:**
+- **Specifieke taken:** Welke taken deed JIJ precies?
+- **Teamrol:** Welke rol nam je op je (leider, onderzoeker, presentator)?
+- **Bijdrage:** Hoe heb je het team geholpen/ondersteund?
+- **Reacties:** Hoe reageerden teamgenoten op jouw inbreng?
+- **Voorbeeld:** Geef een concreet voorbeeld van je bijdrage
+- **Verbetering:** Wat zou je volgende keer anders doen?
+- **Groei:** Waarin wil je groeien als teamlid?`
+      }
+    }
+    
+    return { isComplete: true, followUpMessage: '' }
+  }
+
   const handleFeedbackAnalysis = async (input: string) => {
     // Inhoudelijke validatie per onderdeel
     const validationResult = validateFeedbackContent(input, currentQuestion)
