@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Demo Reflectie Tool - Sportmarketing',
-  description: 'Reflectie tool voor Speco sportmarketing studenten om hun demo presentaties te evalueren en verbeteren',
+  title: 'Demo 1 Reflectie Assistent - Speco Sportmarketing',
+  description: 'Interactieve chatbot die Speco sportmarketing studenten begeleidt bij het reflecteren op hun eerste demo presentatie',
 }
 
 export default function RootLayout({
