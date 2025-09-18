@@ -129,24 +129,6 @@ export default function ChatbotReflection() {
 
 **Datum:** ${today}
 
-Hallo! Ik ben je persoonlijke reflectie-assistent voor **Demo 1 Periode 1** van je **Speco Sportmarketing** studie.
-
-## Wat gaan we doen?
-
-Ik ga je helpen bij het reflecteren op je eerste demo presentatie door:
-
-✅ **Stap 1:** Je studentgegevens verifiëren  
-✅ **Stap 2:** Je presentatie en feedback analyseren  
-✅ **Stap 3:** Concrete actiepunten formuleren  
-✅ **Stap 4:** Je checkpoint resultaten bespreken  
-✅ **Stap 5:** Je aanwezigheid evalueren  
-✅ **Stap 6:** Je persoonlijke bijdrage reflecteren  
-✅ **Stap 7:** Een compleet reflectiedocument genereren  
-
-## Waarom deze reflectie?
-
-Voor veel studenten is dit de eerste keer dat ze moeten reflecteren. Ik help je door **verdiepende vragen** te stellen zodat je niet met korte antwoorden wegkomt. We gaan **concreet** kijken naar wat goed ging, wat beter kan, en vooral: **welke acties** je gaat ondernemen om te verbeteren.
-
 **Let op:** Ik behandel maar één onderwerp tegelijk, zodat je niet overweldigd raakt. Neem de tijd voor je antwoorden - goede reflectie vraagt om eerlijkheid en diepgang.`
   }
 
