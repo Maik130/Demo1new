@@ -615,7 +615,29 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (files && files.length > 0) {
-      const fileNames = Array.from(files).map(f => f.name).join(', ')
+      // Process uploaded files
+      const fileArray = Array.from(files)
+      const presentationFiles = fileArray.filter(f => 
+        f.name.toLowerCase().includes('.ppt') || 
+        f.name.toLowerCase().includes('.pdf') ||
+        f.name.toLowerCase().includes('presentatie') ||
+        f.name.toLowerCase().includes('powerpoint')
+      )
+      const feedbackFiles = fileArray.filter(f => 
+        f.name.toLowerCase().includes('feedback') ||
+        f.name.toLowerCase().includes('.mp3') ||
+        f.name.toLowerCase().includes('.wav') ||
+        f.name.toLowerCase().includes('.doc')
+      )
+      
+      // Update student data with files
+      setStudentData(prev => ({
+        ...prev,
+        presentatieFile: presentationFiles[0] || fileArray[0],
+        feedbackFile: feedbackFiles[0] || (fileArray.length > 1 ? fileArray[1] : undefined)
+      }))
+      
+      const fileNames = fileArray.map(f => f.name).join(', ')
       handleUserInput(`Ik heb de volgende bestanden geüpload: ${fileNames}`)
     }
   }
