@@ -1084,7 +1084,111 @@ ${studentData.persoonlijkeBijdrage || 'Nog in te vullen'}
                 </div>
               )}
               
-              <form onSubmit={handleSubmit} className="flex space-x-4">
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <div className="flex space-x-2">
+                  <textarea
+                    ref={textareaRef}
+                    name="message"
+                    placeholder="Typ je antwoord hier... (neem de tijd voor een uitgebreid antwoord)"
+                    className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                    rows={3}
+                    required
+                    defaultValue={voiceInputText}
+                  />
+                  
+                  {/* Voice Input Button */}
+                  <div className="flex flex-col space-y-2">
+                    <button
+                      type="button"
+                      onClick={isListening ? stopVoiceInput : startVoiceInput}
+                      className={`p-3 rounded-lg transition-all duration-200 ${
+                        isListening 
+                          ? 'bg-red-500 text-white animate-pulse' 
+                          : 'bg-blue-500 hover:bg-blue-600 text-white'
+                      }`}
+                      title={isListening ? 'Stop opname' : 'Start spraakopname'}
+                    >
+                      {isListening ? '⏹️' : '🎤'}
+                    </button>
+                    
+                    <button
+                      type="submit"
+                      className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      Verstuur
+                    </button>
+                  </div>
+                </div>
+                
+                {isListening && (
+                  <div className="text-sm text-blue-600 flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    <span>Luistert... Spreek duidelijk in het Nederlands</span>
+                  </div>
+                )}
+              </form>
+              
+              <div className="mt-2 text-xs text-gray-500 space-y-1">
+                <div>💡 Tip: Geef uitgebreide antwoorden. Ik help je door te vragen als je antwoord te kort is.</div>
+                <div>🎤 Gebruik de microfoon knop om je antwoord in te spreken (Nederlands)</div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Voice Recognition Status */}
+        {isListening && (
+          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center space-x-3">
+              <div className="flex space-x-1">
+                <div className="w-2 h-6 bg-blue-500 rounded animate-pulse"></div>
+                <div className="w-2 h-4 bg-blue-400 rounded animate-pulse" style={{animationDelay: '0.1s'}}></div>
+                <div className="w-2 h-8 bg-blue-500 rounded animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                <div className="w-2 h-3 bg-blue-400 rounded animate-pulse" style={{animationDelay: '0.3s'}}></div>
+              </div>
+              <div>
+                <p className="text-blue-800 font-medium">🎤 Aan het luisteren...</p>
+                <p className="text-blue-600 text-sm">Spreek duidelijk in het Nederlands. Klik op ⏹️ om te stoppen.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Browser Compatibility Warning */}
+        {typeof window !== 'undefined' && !('webkitSpeechRecognition' in window) && (
+          <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <span className="text-yellow-600">⚠️</span>
+              <div>
+                <p className="text-yellow-800 font-medium">Spraakherkenning niet ondersteund</p>
+                <p className="text-yellow-700 text-sm">
+                  Gebruik Chrome of Edge voor de beste ervaring met spraakherkenning.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Progress Indicator */}
+        <div className="mt-6 bg-white rounded-lg p-4 shadow-sm">
+          <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+            <span>Voortgang reflectie</span>
+            <span>{getPhaseNumber(currentPhase)}/8</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div 
+              className="bg-purple-600 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${(getPhaseNumber(currentPhase) / 8) * 100}%` }}
+            ></div>
+          </div>
+          <div className="mt-2 text-xs text-gray-500">
+            {getPhaseDescription(currentPhase)}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
                 <textarea
                   name="message"
                   placeholder="Typ je antwoord hier... (neem de tijd voor een uitgebreid antwoord)"
