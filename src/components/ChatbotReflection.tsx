@@ -58,37 +58,37 @@ export default function ChatbotReflection() {
   // CONFIDENTIAL: Student database from Excel - NEVER show this to students
   const studentDatabase = {
     '123456': {
-      naam: 'Jan Jansen',
+      naam: 'Jansen, Jan',
       aanwezigheid: 85,
       checkpoint3: '7.5',
       checkpoint6: '6.8'
     },
     '234567': {
-      naam: 'Lisa de Vries', 
+      naam: 'Bakker, Lisa',
       aanwezigheid: 92,
       checkpoint3: '8.2',
       checkpoint6: '7.9'
     },
     '345678': {
-      naam: 'Mike van der Berg',
+      naam: 'Berg, Mike van der',
       aanwezigheid: 78,
-      checkpoint3: '6.1', 
+      checkpoint3: '6.1',
       checkpoint6: '7.2'
     },
     '456789': {
-      naam: 'Sarah Bakker',
+      naam: 'Visser, Sarah',
       aanwezigheid: 95,
       checkpoint3: '8.7',
       checkpoint6: '8.9'
     },
     '567890': {
-      naam: 'Tom Visser',
+      naam: 'Jong, Tom de',
       aanwezigheid: 73,
       checkpoint3: '5.8',
       checkpoint6: '6.4'
     },
     '678901': {
-      naam: 'Emma de Jong',
+      naam: 'Smit, Emma',
       aanwezigheid: 88,
       checkpoint3: '7.9',
       checkpoint6: '8.1'
