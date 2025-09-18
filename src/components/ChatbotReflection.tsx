@@ -51,8 +51,12 @@ export default function ChatbotReflection() {
   const [awaitingInput, setAwaitingInput] = useState(false)
   const [currentQuestion, setCurrentQuestion] = useState('')
   const [followUpCount, setFollowUpCount] = useState(0)
+  const [isListening, setIsListening] = useState(false)
+  const [speechRecognition, setSpeechRecognition] = useState<SpeechRecognition | null>(null)
+  const [voiceInputText, setVoiceInputText] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const messageIdCounter = useRef(0)
 
   // CONFIDENTIAL: Student database from Excel - NEVER show this to students
@@ -118,6 +122,51 @@ export default function ChatbotReflection() {
     scrollToBottom()
   }, [messages])
 
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
+      const recognition = new (window as any).webkitSpeechRecognition()
+      recognition.continuous = false
+      recognition.interimResults = true
+      recognition.lang = 'nl-NL'
+      
+      recognition.onstart = () => {
+        setIsListening(true)
+      }
+      
+      recognition.onresult = (event: any) => {
+        let finalTranscript = ''
+        let interimTranscript = ''
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript
+          } else {
+            interimTranscript += transcript
+          }
+        }
+        
+        if (finalTranscript) {
+          setVoiceInputText(finalTranscript)
+          if (textareaRef.current) {
+            textareaRef.current.value = finalTranscript
+          }
+        }
+      }
+      
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error)
+        setIsListening(false)
+      }
+      
+      recognition.onend = () => {
+        setIsListening(false)
+      }
+      
+      setSpeechRecognition(recognition)
+    }
+  }, [])
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
